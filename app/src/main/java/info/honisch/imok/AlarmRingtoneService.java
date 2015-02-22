@@ -15,6 +15,8 @@ import android.util.Log;
 public class AlarmRingtoneService extends Service {
     private static Ringtone m_ringtone;
 
+    int m_alarmType;
+
         @Override
     public IBinder onBind(Intent intent) {
             return null;
@@ -37,5 +39,9 @@ public class AlarmRingtoneService extends Service {
         Log.d("I'm ok", "Stop AlarmRingtoneService");
 
         m_ringtone.stop();
+    }
+
+    public void setAlarmType(int alarmType){
+        m_alarmType = alarmType;
     }
 }

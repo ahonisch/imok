@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -13,9 +14,7 @@ import android.os.Vibrator;
 import android.telephony.SmsManager;
 import android.util.Log;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
 
 /**
  * Created by Andi on 18.02.2015.
@@ -40,14 +39,24 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
     final public static String VIBRATE_PATTERN_WARNING = "EEEEEEEEEE";
     final public static String VIBRATE_PATTERN_ALARM = "EEEEEEEEEEEEEEEEEEEE"; // vibrate stackato
 
-    private GoogleApiClient mGoogleApiClient;
-    private Location mLastLocation;
+    final public static String SHARED_PREF_NAME = "info.honisch.imok.prefs";
+    final public static String SHARED_PREF_NEXT_ALARM = "info.honisch.imok.prefs.nextAlarm";
+    final public static String SHARED_PREF_ALARM_TYPE = "info.honisch.imok.prefs.AlarmType";
+
+
+    private boolean m_isReceiverRunning = false;
+    private int m_alarmType = ALARM_TYPE_UNKNOWN;
+    private long m_nextAlarm = -1;
+
 
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d("I'm ok", "AlarmManager.onReceive");
 
         long startTime;
+        boolean isStartActivity = false;
+
+        m_isReceiverRunning = true;
 
         int alarmType = intent.getIntExtra(ALARM_TYPE, ALARM_TYPE_UNKNOWN);
         long alarmSoundDuration = intent.getLongExtra(ALARM_SOUND_DURATION, DEFAULT_ALARM_SOUND_DURATION);
@@ -56,19 +65,11 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
         long sequenceAlarmSoundDuration = intent.getLongExtra(SEQUENCE_ALARM_SOUND_DURATION, DEFAULT_ALARM_SOUND_DURATION);
         Log.d("I'm ok", "AlarmType: " + Integer.toString(alarmType));
 
-        // Start MainActivity or bring it to front
-        Intent intentMainActivity = new Intent(context, MainActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putInt(ALARM_TYPE, alarmType);
-        bundle.putInt(SEQUENCE_ALARM_TYPE, sequenceAlarmType);
-        //intentMainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        intentMainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intentMainActivity, bundle);
-
 
         // Stop Vibrator when new Alarm is received
         Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         if (vibrator.hasVibrator()) vibrator.cancel();
+
 
         // Stop AlarmSound when new Alarm received
         Intent alarmRingtoneService = new Intent(context, AlarmRingtoneService.class);
@@ -87,6 +88,10 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 
                 startTime = System.currentTimeMillis() + alarmSoundDuration;
                 setAlarm(context, startTime, ALARM_TYPE_SOUNDOFF, alarmSoundDuration, sequenceAlarmStartTime, sequenceAlarmType, sequenceAlarmSoundDuration);
+                writePref(context, ALARM_TYPE_ALARM, sequenceAlarmStartTime);
+
+                isStartActivity = true;
+
                 break;
             case ALARM_TYPE_ALARM:
                 Log.d("I'm ok", "AlarmManager.onReceive ALARM_TYPE_ALARM");
@@ -100,6 +105,9 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 
                 startTime = System.currentTimeMillis() + alarmSoundDuration;
                 setAlarm(context, startTime, ALARM_TYPE_SOUNDOFF, 0, 0, ALARM_TYPE_UNKNOWN, 0);
+
+                isStartActivity = true;
+
                 break;
             case ALARM_TYPE_SOUNDOFF:
                 Log.d("I'm ok", "AlarmManager.onReceive ALARM_TYPE_SOUNDOFF");
@@ -111,11 +119,25 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
                     sendSms(context, ALARM_TYPE_ALARM);
                 }
 
+                isStartActivity = false;
+
                 break;
             default:
                 Log.d("I'm ok", "AlarmManager.onReceive unknown!!");
+                isStartActivity = false;
                 break;
         }
+
+        isStartActivity = false;
+        if (isStartActivity) {
+            // Start MainActivity or bring it to front
+            Intent intentMainActivity = new Intent(context, MainActivity.class);
+            intentMainActivity.putExtra(ALARM_TYPE, alarmType);
+            intentMainActivity.putExtra(SEQUENCE_ALARM_TYPE, sequenceAlarmType);
+            intentMainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intentMainActivity);
+        }
+
     }
 
 
@@ -164,6 +186,21 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 
         SmsManager sms = SmsManager.getDefault();
         //sms.sendTextMessage("01603147344", null, smsText, null, null);
+    }
+
+    public boolean getIsReceiverRunning() {
+        return m_isReceiverRunning;
+    }
+
+    public int getAlarmType() {
+        return m_alarmType;
+    }
+
+    public void writePref(Context context, int alarmType, long nextAlarmTime) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(AlarmManagerBroadcastReceiver.SHARED_PREF_NAME, Context.MODE_PRIVATE).edit();
+        editor.putString(SHARED_PREF_ALARM_TYPE,Integer.toString(alarmType));
+        editor.putString(SHARED_PREF_NEXT_ALARM,Long.toString(nextAlarmTime));
+        editor.commit();
     }
 
 }
