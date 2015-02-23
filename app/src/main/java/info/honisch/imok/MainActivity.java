@@ -2,8 +2,8 @@ package info.honisch.imok;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.SystemClock;
 import android.os.Vibrator;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -42,9 +42,9 @@ public class MainActivity extends ActionBarActivity {
     final static int STATUS_SLEEPING = -1;
 
     final static String CURRENT_STATUS = "CurrentStatus";
-    final static String CURRENT_TimeCounter = "CurrentTimeCounter";
+    final static String NEXT_ALARM = "NextAlarm";
 
-    private Date m_TimeCounter;
+    private long m_nextAlarm;
     private int m_Status = STATUS_INIT;
     private AlarmManagerBroadcastReceiver m_Alarm;
 
@@ -54,9 +54,10 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.d("I'm ok", "onCreate");
+        Log.i("I'm ok", "onCreate");
 
         setContentView(R.layout.layout_reset);
+        //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         Chronometer chronometer = (Chronometer)findViewById(R.id.chronometer);
         chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
@@ -129,119 +130,76 @@ public class MainActivity extends ActionBarActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        Log.d("I'm ok", "onSaveInstanceState");
+        Log.i("I'm ok", "onSaveInstanceState");
 
         outState.putInt(CURRENT_STATUS, m_Status);
-        outState.putLong(CURRENT_TimeCounter, m_TimeCounter.getTime());
+        outState.putLong(NEXT_ALARM, m_nextAlarm);
     }
 
 
 
-/*    @Override
+    @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
-        Log.d("I'm ok", "onRestoreInstanceState");
+        Log.i("I'm ok", "onRestoreInstanceState");
 
-        m_Status = savedInstanceState.getInt(CURRENT_STATUS);
-
-        long tc = savedInstanceState.getLong(CURRENT_TimeCounter);
-        m_TimeCounter.setTime(tc);
+        initActivity(savedInstanceState);
     }
-*/
-
 
     // *** private methods ***
     private void initActivity(Bundle savedInstanceState) {
-        Log.d("I'm ok", "initActivity");
+        Log.i("I'm ok", "initActivity");
 
-        Chronometer chronometer = (Chronometer)findViewById(R.id.chronometer);
         m_Alarm = new AlarmManagerBroadcastReceiver();
-        m_TimeCounter = new Date();
 
-        if (savedInstanceState != null) initActivityFromBundle(savedInstanceState);
-        else {
-            Bundle bundle = getIntent().getExtras();
+        SharedPreferences sharedPreferences = getSharedPreferences(AlarmManagerBroadcastReceiver.SHARED_PREF_NAME, MODE_PRIVATE);
+        String restoredText = sharedPreferences.getString(AlarmManagerBroadcastReceiver.SHARED_PREF_ALARM_TYPE, null);
 
-//          if (intent.hasExtra(ALARM_TYPE)) initActivityFromIntent();
-            if (bundle != null) initActivityFromIntent();
-            else initActivityFromStartup();
+        if (restoredText != null) {
+            initActivityFromPref();
+        } else {
+            initActivityFromStartup();
         }
 
         updateGui();
     }
 
-    private void initActivityFromIntent() {
-        Log.d("I'm ok", "initActivityFromIntent");
+    private void initActivityFromPref() {
+        Log.i("I'm ok", "initActivityFromPref");
 
         long tc = 0;
 
-        Intent intent = getIntent();
+        SharedPreferences sharedPreferences = getSharedPreferences(AlarmManagerBroadcastReceiver.SHARED_PREF_NAME, MODE_PRIVATE);
+        String prefAlarmType = sharedPreferences.getString(AlarmManagerBroadcastReceiver.SHARED_PREF_ALARM_TYPE, null);
+        String prefNextAlarm = sharedPreferences.getString(AlarmManagerBroadcastReceiver.SHARED_PREF_NEXT_ALARM, null);
 
-        int alarmType = intent.getIntExtra(ALARM_TYPE, ALARM_TYPE_UNKNOWN);
-        int sequenceAlarmType = intent.getIntExtra(SEQUENCE_ALARM_TYPE, ALARM_TYPE_UNKNOWN);
+        int alarmType = Integer.valueOf(prefAlarmType);
+        m_nextAlarm = Long.valueOf(prefNextAlarm);
 
-        if (alarmType == ALARM_TYPE_WARNING) {
-            tc = 0;
-            m_Status = STATUS_IMOK;
+        if (m_nextAlarm < System.currentTimeMillis()) {
+            initActivityFromStartup();
+        } else {
+            switch (alarmType) {
+                case ALARM_TYPE_WARNING:
+                    m_Status = STATUS_IMOK;
+                case ALARM_TYPE_ALARM:
+                    m_Status = STATUS_WARNING;
+            }
         }
-
-        if (alarmType == ALARM_TYPE_SOUNDOFF && sequenceAlarmType == ALARM_TYPE_ALARM) {
-            m_Status = STATUS_WARNING;
-        }
-
-        if (alarmType == ALARM_TYPE_ALARM) {
-            tc = 0;
-            m_Status = STATUS_WARNING;
-        }
-
-        if (alarmType == ALARM_TYPE_SOUNDOFF && sequenceAlarmType == ALARM_TYPE_UNKNOWN) {
-            m_Status = STATUS_ALARM;
-        }
-
-        Chronometer chronometer = (Chronometer)findViewById(R.id.chronometer);
-        chronometer.setBase(SystemClock.elapsedRealtime() + tc);
-
-        m_TimeCounter.setTime(tc);
-        chronometer.start();
     }
 
     private void initActivityFromStartup() {
-        Log.d("I'm ok", "initActivityFromStartup");
+        Log.i("I'm ok", "initActivityFromStartup");
 
-        long tc = TIME_TO_WARNING;
         setAlarm();
 
         Chronometer chronometer = (Chronometer)findViewById(R.id.chronometer);
-        chronometer.setBase(SystemClock.elapsedRealtime());
+        chronometer.setBase(System.currentTimeMillis());
 
-        m_TimeCounter.setTime(tc);
         chronometer.start();
 
         m_Status = STATUS_IMOK;
-    }
-
-    private void initActivityFromBundle(Bundle savedInstanceState) {
-        Log.d("I'm ok", "initActivityFromBundle");
-
-        m_Status = savedInstanceState.getInt(CURRENT_STATUS);
-        long tc = savedInstanceState.getLong(CURRENT_TimeCounter);
-        m_TimeCounter.setTime(tc);
-
-        Chronometer chronometer = (Chronometer)findViewById(R.id.chronometer);
-
-        switch (m_Status) {
-            case STATUS_IMOK:
-                chronometer.setBase(SystemClock.elapsedRealtime() - TIME_TO_WARNING + tc);
-                chronometer.start();
-                break;
-            case STATUS_WARNING:
-                chronometer.setBase(SystemClock.elapsedRealtime() - TIME_TO_ALARM + tc);
-                chronometer.start();
-                break;
-            default:
-                break;
-        }
     }
 
     private void handleBtnEmergencyCallLongClick(View v) {
@@ -320,30 +278,14 @@ public class MainActivity extends ActionBarActivity {
 
         if (m_Status == STATUS_INIT) return;
 
-        switch (m_Status) {
-            case STATUS_IMOK:
-                timeOut = TIME_TO_WARNING;
-                break;
-            case STATUS_WARNING:
-                timeOut = TIME_TO_ALARM;
-                break;
-            default:
-                timeOut = TIME_TO_WARNING;
-                break;
-        }
-
-        long timeDiff = SystemClock.elapsedRealtime() - chronometer.getBase();
-        if (timeOut - timeDiff > 0) {
-            m_TimeCounter.setTime(timeOut - timeDiff);
-        }
-
-        if ((timeOut - timeDiff) < 0) {
-            chronometer.stop();
+        long timeDiff = m_nextAlarm - System.currentTimeMillis();
+        if (timeDiff < 0) {
             switch (m_Status) {
                 case STATUS_IMOK:
                     m_Status = STATUS_WARNING;
-                    chronometer.setBase(SystemClock.elapsedRealtime());
-                    chronometer.start();
+                    break;
+                case STATUS_WARNING:
+                    m_Status = STATUS_ALARM;
                     break;
                 default:
                     m_Status = STATUS_ALARM;
@@ -358,9 +300,7 @@ public class MainActivity extends ActionBarActivity {
         Log.d("I'm ok", "startCounter");
 
         Chronometer chronometer = (Chronometer)findViewById(R.id.chronometer);
-        chronometer.setBase(SystemClock.elapsedRealtime());
-
-        m_TimeCounter.setTime(TIME_TO_WARNING);
+        chronometer.setBase(System.currentTimeMillis());
 
         setAlarm();
         chronometer.start();
@@ -419,11 +359,13 @@ public class MainActivity extends ActionBarActivity {
         // long AlarmSoundDuration
         // ENDTODO
 
-        long startTime = System.currentTimeMillis() + timeToWarning;
+        m_nextAlarm = System.currentTimeMillis() + timeToWarning;
         long sequenceAlarmStartTime = System.currentTimeMillis() + timeToWarning + timeToAlarm;
         int sequenceAlarmType = AlarmManagerBroadcastReceiver.ALARM_TYPE_ALARM;
 
-        m_Alarm.setAlarm(context, startTime, AlarmManagerBroadcastReceiver.ALARM_TYPE_WARNING, alarmSoundDuration, sequenceAlarmStartTime, sequenceAlarmType, sequenceAlarmSoundDuration);
+        m_Alarm.setAlarm(context, m_nextAlarm, AlarmManagerBroadcastReceiver.ALARM_TYPE_WARNING, alarmSoundDuration, sequenceAlarmStartTime, sequenceAlarmType, sequenceAlarmSoundDuration);
+        m_Alarm.writePref(context, ALARM_TYPE_WARNING, sequenceAlarmStartTime);
+
     }
 
     private void confirmLongClick() {
@@ -450,7 +392,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void updateGui() {
-        // Log.d("I'm ok", "updateGui");
+        Log.v("I'm ok", "updateGui");
 
         RelativeLayout layoutTimer = (RelativeLayout) findViewById(R.id.layout_Timer);
         TextView txtTimer = (TextView) findViewById(R.id.txt_Timer);
@@ -458,7 +400,9 @@ public class MainActivity extends ActionBarActivity {
         ToggleButton toggleActive = (ToggleButton) findViewById(R.id.toggle_Active);
 
         SimpleDateFormat ft = new SimpleDateFormat("mm:ss");
-        txtTimer.setText(ft.format(m_TimeCounter));
+        Date timeCounter = new Date();
+        timeCounter.setTime(m_nextAlarm - System.currentTimeMillis());
+        txtTimer.setText(ft.format(timeCounter));
 
         switch (m_Status) {
             case STATUS_IMOK:
