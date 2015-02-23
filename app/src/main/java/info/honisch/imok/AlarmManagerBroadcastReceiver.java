@@ -32,7 +32,8 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
     final public static int ALARM_TYPE_SOUNDOFF = 0;
     final public static int ALARM_TYPE_WARNING = 1;
     final public static int ALARM_TYPE_ALARM = 2;
-    final public static int ALARM_TYPE_MANUALLY = 3;
+    final public static int ALARM_TYPE_SLEEPING = 3;
+    final public static int ALARM_TYPE_MANUALLY = 4;
 
     final public static long DEFAULT_ALARM_SOUND_DURATION = 30 * 1000; // 30 sec
 
@@ -105,6 +106,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 
                 startTime = System.currentTimeMillis() + alarmSoundDuration;
                 setAlarm(context, startTime, ALARM_TYPE_SOUNDOFF, 0, 0, ALARM_TYPE_UNKNOWN, 0);
+                writePref(context, ALARM_TYPE_UNKNOWN, System.currentTimeMillis() - 1);
 
                 isStartActivity = true;
 
@@ -128,18 +130,13 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
                 break;
         }
 
-        isStartActivity = false;
         if (isStartActivity) {
-            // Start MainActivity or bring it to front
             Intent intentMainActivity = new Intent(context, MainActivity.class);
-            intentMainActivity.putExtra(ALARM_TYPE, alarmType);
-            intentMainActivity.putExtra(SEQUENCE_ALARM_TYPE, sequenceAlarmType);
-            intentMainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intentMainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             context.startActivity(intentMainActivity);
         }
 
     }
-
 
     public void setAlarm(Context context, long startTime, int alarmType, long alarmSoundDuration,
                          long sequenceAlarmStartTime, int sequenceAlarmType, long sequenceAlarmSoundDuration) {
@@ -185,7 +182,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
                 + Double.toString(location.getLongitude());
 
         SmsManager sms = SmsManager.getDefault();
-        //sms.sendTextMessage("01603147344", null, smsText, null, null);
+        sms.sendTextMessage("01603147344", null, smsText, null, null);
     }
 
     public boolean getIsReceiverRunning() {
@@ -197,6 +194,8 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
     }
 
     public void writePref(Context context, int alarmType, long nextAlarmTime) {
+        Log.d("I'm ok", "AlarmManager.writePref (" + Integer.toString(alarmType) + "/" + Long.toString((nextAlarmTime - System.currentTimeMillis()) / 1000) + ")");
+
         SharedPreferences.Editor editor = context.getSharedPreferences(AlarmManagerBroadcastReceiver.SHARED_PREF_NAME, Context.MODE_PRIVATE).edit();
         editor.putString(SHARED_PREF_ALARM_TYPE,Integer.toString(alarmType));
         editor.putString(SHARED_PREF_NEXT_ALARM,Long.toString(nextAlarmTime));

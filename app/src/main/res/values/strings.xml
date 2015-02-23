@@ -7,7 +7,8 @@
     <string name="toggle_active">New ToggleButton</string>
     <string name="toggle_active_off">Wake up</string>
     <string name="toggle_active_on">Pause</string>
-    <string name="button_settings_content_description">Enter Settings</string>
+    <string name="btn_sleeping_content_description">Pause</string>
+    <string name="btn_emergency_call_content_description">Emergency Call</string>
     <string name="btnEmergencyCall">Emergency Call</string>
 
 </resources>

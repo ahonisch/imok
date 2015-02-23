@@ -67,11 +67,13 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        ToggleButton toggleActive = (ToggleButton) findViewById(R.id.toggle_Active);
-        toggleActive.setOnClickListener(new View.OnClickListener() {
+        ImageButton btnSleeping = (ImageButton) findViewById(R.id.btn_Sleeping);
+        btnSleeping.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
-                handleToggleActiveClick(v);
+            public boolean onLongClick(View v) {
+                handleBtnSleepingLongClick(v);
+
+                return true;
             }
         });
 
@@ -91,7 +93,7 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        ImageButton btnEmergencyCall = (ImageButton) findViewById(R.id.btnEmergencyCall);
+        ImageButton btnEmergencyCall = (ImageButton) findViewById(R.id.btn_emergency_call);
         btnEmergencyCall.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -101,6 +103,14 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
+        initActivity(savedInstanceState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        Log.d("I'm ok", "onRestoreInstanceState");
         initActivity(savedInstanceState);
     }
 
@@ -126,26 +136,6 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        Log.i("I'm ok", "onSaveInstanceState");
-
-        outState.putInt(CURRENT_STATUS, m_Status);
-        outState.putLong(NEXT_ALARM, m_nextAlarm);
-    }
-
-
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-
-        Log.i("I'm ok", "onRestoreInstanceState");
-
-        initActivity(savedInstanceState);
-    }
 
     // *** private methods ***
     private void initActivity(Bundle savedInstanceState) {
@@ -153,14 +143,19 @@ public class MainActivity extends ActionBarActivity {
 
         m_Alarm = new AlarmManagerBroadcastReceiver();
 
+        Chronometer chronometer = (Chronometer)findViewById(R.id.chronometer);
+        chronometer.setBase(System.currentTimeMillis());
+
+        chronometer.stop();
+        chronometer.start();
+
         SharedPreferences sharedPreferences = getSharedPreferences(AlarmManagerBroadcastReceiver.SHARED_PREF_NAME, MODE_PRIVATE);
         String restoredText = sharedPreferences.getString(AlarmManagerBroadcastReceiver.SHARED_PREF_ALARM_TYPE, null);
 
-        if (restoredText != null) {
-            initActivityFromPref();
-        } else {
-            initActivityFromStartup();
-        }
+        m_Status = STATUS_IMOK;
+
+        if (restoredText == null) setAlarm();
+        else initActivityFromPref();
 
         updateGui();
     }
@@ -168,24 +163,41 @@ public class MainActivity extends ActionBarActivity {
     private void initActivityFromPref() {
         Log.i("I'm ok", "initActivityFromPref");
 
-        long tc = 0;
-
         SharedPreferences sharedPreferences = getSharedPreferences(AlarmManagerBroadcastReceiver.SHARED_PREF_NAME, MODE_PRIVATE);
         String prefAlarmType = sharedPreferences.getString(AlarmManagerBroadcastReceiver.SHARED_PREF_ALARM_TYPE, null);
         String prefNextAlarm = sharedPreferences.getString(AlarmManagerBroadcastReceiver.SHARED_PREF_NEXT_ALARM, null);
 
+        Log.i("I'm ok", "initActivityFromPref (" + prefAlarmType + "/" + Long.toString((Long.valueOf(prefNextAlarm) - System.currentTimeMillis()) / 1000) + ")");
+
         int alarmType = Integer.valueOf(prefAlarmType);
         m_nextAlarm = Long.valueOf(prefNextAlarm);
 
-        if (m_nextAlarm < System.currentTimeMillis()) {
-            initActivityFromStartup();
-        } else {
-            switch (alarmType) {
-                case ALARM_TYPE_WARNING:
+        switch (alarmType) {
+            case ALARM_TYPE_WARNING:
+                if (m_nextAlarm < System.currentTimeMillis()) setAlarm();
+
+                m_Status = STATUS_IMOK;
+                Log.i("I'm ok", "STATUS_IMOK");
+                break;
+            case ALARM_TYPE_ALARM:
+                if (m_nextAlarm < System.currentTimeMillis()) {
                     m_Status = STATUS_IMOK;
-                case ALARM_TYPE_ALARM:
+                    Log.i("I'm ok", "STATUS_IMOK");
+                    setAlarm();
+                }
+                else {
                     m_Status = STATUS_WARNING;
-            }
+                    Log.i("I'm ok", "STATUS_WARNING");
+                }
+                break;
+            case ALARM_TYPE_UNKNOWN:
+                m_Status = STATUS_ALARM;
+                Log.i("I'm ok", "STATUS_ALARM");
+                break;
+            case ALARM_TYPE_SLEEPING:
+                m_Status = STATUS_SLEEPING;
+                Log.i("I'm ok", "STATUS_SLEEPING");
+                break;
         }
     }
 
@@ -193,11 +205,6 @@ public class MainActivity extends ActionBarActivity {
         Log.i("I'm ok", "initActivityFromStartup");
 
         setAlarm();
-
-        Chronometer chronometer = (Chronometer)findViewById(R.id.chronometer);
-        chronometer.setBase(System.currentTimeMillis());
-
-        chronometer.start();
 
         m_Status = STATUS_IMOK;
     }
@@ -213,14 +220,11 @@ public class MainActivity extends ActionBarActivity {
 
         stopCounter(false);
 
-        ToggleButton toggleActive = (ToggleButton) findViewById(R.id.toggle_Active);
-        if (!toggleActive.isChecked()) toggleActive.setChecked(true);
-
         startCounter();
 
         updateGui();
 
-        moveTaskToBack(false);
+        moveTaskToBack(true);
 
         Intent callIntent = new Intent(Intent.ACTION_CALL);
         callIntent.setData(Uri.parse("tel:075244092256"));
@@ -237,7 +241,7 @@ public class MainActivity extends ActionBarActivity {
 
         updateGui();
 
-        moveTaskToBack(false);
+        moveTaskToBack(true);
     }
 
     private void handleBtnResetClick(View v) {
@@ -249,18 +253,15 @@ public class MainActivity extends ActionBarActivity {
 
         stopCounter();
 
-        ToggleButton toggleActive = (ToggleButton) findViewById(R.id.toggle_Active);
-        if (!toggleActive.isChecked()) toggleActive.setChecked(true);
-
         startCounter();
 
         updateGui();
 
-        moveTaskToBack(false);
+        moveTaskToBack(true);
     }
 
-    private void handleToggleActiveClick(View v) {
-        Log.d("I'm ok", "handleToggleActiveClick");
+    private void handleBtnSleepingLongClick(View v) {
+        Log.d("I'm ok", "handleBtnSleepingLongClick");
 
         if (m_Status == STATUS_INIT) return;
 
@@ -268,30 +269,17 @@ public class MainActivity extends ActionBarActivity {
 
         stopCounter();
 
+        m_Alarm.writePref(this.getApplicationContext(), ALARM_TYPE_SLEEPING, System.currentTimeMillis() - 1);
+
         updateGui();
 
-        moveTaskToBack(false);
+        moveTaskToBack(true);
     }
 
     private void handleChronometerTick(Chronometer chronometer) {
         long timeOut;
 
         if (m_Status == STATUS_INIT) return;
-
-        long timeDiff = m_nextAlarm - System.currentTimeMillis();
-        if (timeDiff < 0) {
-            switch (m_Status) {
-                case STATUS_IMOK:
-                    m_Status = STATUS_WARNING;
-                    break;
-                case STATUS_WARNING:
-                    m_Status = STATUS_ALARM;
-                    break;
-                default:
-                    m_Status = STATUS_ALARM;
-                    break;
-            }
-        }
 
         updateGui();
     }
@@ -364,7 +352,7 @@ public class MainActivity extends ActionBarActivity {
         int sequenceAlarmType = AlarmManagerBroadcastReceiver.ALARM_TYPE_ALARM;
 
         m_Alarm.setAlarm(context, m_nextAlarm, AlarmManagerBroadcastReceiver.ALARM_TYPE_WARNING, alarmSoundDuration, sequenceAlarmStartTime, sequenceAlarmType, sequenceAlarmSoundDuration);
-        m_Alarm.writePref(context, ALARM_TYPE_WARNING, sequenceAlarmStartTime);
+        m_Alarm.writePref(context, ALARM_TYPE_WARNING, m_nextAlarm);
 
     }
 
@@ -392,12 +380,12 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void updateGui() {
-        Log.v("I'm ok", "updateGui");
+        //Log.v("I'm ok", "updateGui");
 
         RelativeLayout layoutTimer = (RelativeLayout) findViewById(R.id.layout_Timer);
         TextView txtTimer = (TextView) findViewById(R.id.txt_Timer);
         ImageButton btnReset = (ImageButton) findViewById(R.id.btn_Reset);
-        ToggleButton toggleActive = (ToggleButton) findViewById(R.id.toggle_Active);
+        ImageButton btnSleeping = (ImageButton) findViewById(R.id.btn_Sleeping);
 
         SimpleDateFormat ft = new SimpleDateFormat("mm:ss");
         Date timeCounter = new Date();
@@ -409,25 +397,26 @@ public class MainActivity extends ActionBarActivity {
                 layoutTimer.setBackgroundColor(TIMER_BACKGROUND_COLOR_WARNING);
                 txtTimer.setVisibility(View.VISIBLE);
                 btnReset.setImageResource(R.drawable.imok);
-                toggleActive.setVisibility(View.VISIBLE);
+                btnSleeping.setVisibility(View.VISIBLE);
                 break;
             case STATUS_WARNING:
                 layoutTimer.setBackgroundColor(TIMER_BACKGROUND_COLOR_ALARM);
                 txtTimer.setVisibility(View.VISIBLE);
                 btnReset.setImageResource(R.drawable.warning);
-                toggleActive.setVisibility(View.INVISIBLE);
+                btnSleeping.setVisibility(View.INVISIBLE);
                 break;
             case STATUS_ALARM:
                 layoutTimer.setBackgroundColor(TIMER_BACKGROUND_COLOR_NOK);
                 txtTimer.setVisibility(View.INVISIBLE);
                 btnReset.setImageResource(R.drawable.alarm);
-                toggleActive.setVisibility(View.INVISIBLE);
+                btnSleeping.setVisibility(View.INVISIBLE);
                 break;
             case STATUS_SLEEPING:
+                //Log.v("I'm ok", "updateGui: Sleeping");
                 layoutTimer.setBackgroundColor(TIMER_BACKGROUND_COLOR_SLEEPING);
                 txtTimer.setVisibility(View.INVISIBLE);
                 btnReset.setImageResource(R.drawable.sleeping);
-                toggleActive.setVisibility(View.INVISIBLE);
+                btnSleeping.setVisibility(View.INVISIBLE);
                 break;
         }
     }
