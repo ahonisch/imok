@@ -122,7 +122,6 @@ public class MainActivity extends ActionBarActivity {
         Log.i("I'm ok", "onCreate");
 
         setContentView(R.layout.layout_reset);
-        //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         Chronometer chronometer = (Chronometer)findViewById(R.id.chronometer);
         chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
@@ -195,7 +194,7 @@ public class MainActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            //TODO openSettings();
+            openSettings();
             return true;
         }
 
@@ -269,6 +268,11 @@ public class MainActivity extends ActionBarActivity {
                 Log.i("I'm ok", "STATUS_SLEEPING");
                 break;
         }
+    }
+
+    private void openSettings() {
+        Intent intent = new Intent(this, Settings.class);
+        startActivity(intent);
     }
 
     private void createSharedPref() {

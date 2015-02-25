@@ -26,8 +26,16 @@
             </intent-filter>
         </activity>
 
-        <receiver
-            android:name=".AlarmManagerBroadcastReceiver" >
+        <activity
+            android:name=".Settings"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="info.honisch.imok.MainActivity" />
+        </activity>
+
+        <receiver android:name=".AlarmManagerBroadcastReceiver" >
         </receiver>
 
         <service
