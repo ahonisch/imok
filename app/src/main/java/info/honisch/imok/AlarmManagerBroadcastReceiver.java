@@ -8,117 +8,107 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.telephony.SmsManager;
 import android.util.Log;
 
-import com.google.android.gms.common.api.GoogleApiClient;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by Andi on 18.02.2015.
  */
 
 public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
-
-    final public static String ALARM_TYPE = "Alarm Type";
-    final public static String ALARM_SOUND_DURATION = "Alarm Sound Duration";
-    final public static String SEQUENCE_ALARM_TYPE = "Sequence Alarm Type";
-    final public static String SEQUENCE_ALARM_START_TIME = "Sequence Alarm Time";
-    final public static String SEQUENCE_ALARM_SOUND_DURATION = "Sequence Alarm Sound Duration";
-
-    final public static int ALARM_TYPE_UNKNOWN = -1;
-    final public static int ALARM_TYPE_SOUNDOFF = 0;
-    final public static int ALARM_TYPE_WARNING = 1;
-    final public static int ALARM_TYPE_ALARM = 2;
-    final public static int ALARM_TYPE_SLEEPING = 3;
-    final public static int ALARM_TYPE_MANUALLY = 4;
-
-    final public static long DEFAULT_ALARM_SOUND_DURATION = 30 * 1000; // 30 sec
-
-    final public static String VIBRATE_PATTERN_WARNING = "EEEEEEEEEE";
-    final public static String VIBRATE_PATTERN_ALARM = "EEEEEEEEEEEEEEEEEEEE"; // vibrate stackato
-
-    final public static String SHARED_PREF_NAME = "info.honisch.imok.prefs";
-    final public static String SHARED_PREF_NEXT_ALARM = "info.honisch.imok.prefs.nextAlarm";
-    final public static String SHARED_PREF_ALARM_TYPE = "info.honisch.imok.prefs.AlarmType";
-
-
-    private boolean m_isReceiverRunning = false;
-    private int m_alarmType = ALARM_TYPE_UNKNOWN;
-    private long m_nextAlarm = -1;
-
-
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d("I'm ok", "AlarmManager.onReceive");
 
         long startTime;
-        boolean isStartActivity = false;
+        boolean isStartActivity;
 
-        m_isReceiverRunning = true;
+        int alarmType = intent.getIntExtra(MainActivity.QUALIFIER_ALARM_TYPE, MainActivity.ALARM_TYPE_UNKNOWN);
+        long alarmSoundDuration = intent.getLongExtra(MainActivity.QUALIFIER_ALARM_SOUND_DURATION, MainActivity.WARNING_SOUND_DURATION);
+        String alarmVibratePattern = intent.getStringExtra(MainActivity.QUALIFIER_ALARM_VIBRATE_PATTERN);
+        long sequenceAlarmStartTime = intent.getLongExtra(MainActivity.QUALIFIER_SEQUENCE_ALARM_START_TIME, 0);
+        int sequenceAlarmType = intent.getIntExtra(MainActivity.QUALIFIER_SEQUENCE_ALARM_TYPE, MainActivity.ALARM_TYPE_UNKNOWN);
+        long sequenceAlarmSoundDuration = intent.getLongExtra(MainActivity.QUALIFIER_SEQUENCE_ALARM_SOUND_DURATION, MainActivity.ALARM_SOUND_DURATION);
+        String sequenceVibratePattern = intent.getStringExtra(MainActivity.QUALIFIER_SEQUENCE_VIBRATE_PATTERN);
+        String smsTelno = intent.getStringExtra(MainActivity.QUALIFIER_ALARM_SMS_TELNO);
+        String smsText = intent.getStringExtra(MainActivity.QUALIFIER_ALARM_SMS_TEXT);
+        String sequenceSmsTelno = intent.getStringExtra(MainActivity.QUALIFIER_SEQUENCE_SMS_TELNO);
+        String sequenceSmsText = intent.getStringExtra(MainActivity.QUALIFIER_SEQUENCE_SMS_TEXT);
 
-        int alarmType = intent.getIntExtra(ALARM_TYPE, ALARM_TYPE_UNKNOWN);
-        long alarmSoundDuration = intent.getLongExtra(ALARM_SOUND_DURATION, DEFAULT_ALARM_SOUND_DURATION);
-        long sequenceAlarmStartTime = intent.getLongExtra(SEQUENCE_ALARM_START_TIME, 0);
-        int sequenceAlarmType = intent.getIntExtra(SEQUENCE_ALARM_TYPE, ALARM_TYPE_UNKNOWN);
-        long sequenceAlarmSoundDuration = intent.getLongExtra(SEQUENCE_ALARM_SOUND_DURATION, DEFAULT_ALARM_SOUND_DURATION);
         Log.d("I'm ok", "AlarmType: " + Integer.toString(alarmType));
-
 
         // Stop Vibrator when new Alarm is received
         Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         if (vibrator.hasVibrator()) vibrator.cancel();
-
 
         // Stop AlarmSound when new Alarm received
         Intent alarmRingtoneService = new Intent(context, AlarmRingtoneService.class);
         context.stopService(alarmRingtoneService);
 
         switch (alarmType) {
-            case ALARM_TYPE_WARNING:
+            case MainActivity.ALARM_TYPE_WARNING:
                 Log.d("I'm ok", "AlarmManager.onReceive ALARM_TYPE_WARNING");
 
                 if (vibrator.hasVibrator()) {
-                    long[] pattern = MorseCodeConverter.pattern(VIBRATE_PATTERN_WARNING);
+                    long[] pattern = MorseCodeConverter.pattern(alarmVibratePattern);
                     vibrator.vibrate(pattern, -1);
                 }
 
                 context.startService(alarmRingtoneService);
 
                 startTime = System.currentTimeMillis() + alarmSoundDuration;
-                setAlarm(context, startTime, ALARM_TYPE_SOUNDOFF, alarmSoundDuration, sequenceAlarmStartTime, sequenceAlarmType, sequenceAlarmSoundDuration);
-                writePref(context, ALARM_TYPE_ALARM, sequenceAlarmStartTime);
+                setAlarm(context,
+                        smsTelno, smsText,
+                        startTime, MainActivity.ALARM_TYPE_SOUNDOFF, alarmSoundDuration, alarmVibratePattern,
+                        sequenceSmsTelno, sequenceSmsText,
+                        sequenceAlarmStartTime, sequenceAlarmType, sequenceAlarmSoundDuration, sequenceVibratePattern);
+                writePref(context, MainActivity.ALARM_TYPE_ALARM, sequenceAlarmStartTime);
 
                 isStartActivity = true;
 
                 break;
-            case ALARM_TYPE_ALARM:
+            case MainActivity.ALARM_TYPE_ALARM:
                 Log.d("I'm ok", "AlarmManager.onReceive ALARM_TYPE_ALARM");
 
+
                 if (vibrator.hasVibrator()) {
-                    long[] pattern = MorseCodeConverter.pattern(VIBRATE_PATTERN_ALARM);
+                    long[] pattern = MorseCodeConverter.pattern(alarmVibratePattern);
                     vibrator.vibrate(pattern, -1);
                 }
 
                 context.startService(alarmRingtoneService);
 
                 startTime = System.currentTimeMillis() + alarmSoundDuration;
-                setAlarm(context, startTime, ALARM_TYPE_SOUNDOFF, 0, 0, ALARM_TYPE_UNKNOWN, 0);
-                writePref(context, ALARM_TYPE_UNKNOWN, System.currentTimeMillis() - 1);
+                setAlarm(context,
+                        smsTelno, smsText,
+                        startTime, MainActivity.ALARM_TYPE_SOUNDOFF, 0, alarmVibratePattern,
+                        sequenceSmsTelno, sequenceSmsText,
+                        0, MainActivity.ALARM_TYPE_UNKNOWN, 0, sequenceVibratePattern);
+                writePref(context, MainActivity.ALARM_TYPE_UNKNOWN, System.currentTimeMillis() - 1);
 
                 isStartActivity = true;
 
                 break;
-            case ALARM_TYPE_SOUNDOFF:
+            case MainActivity.ALARM_TYPE_SOUNDOFF:
                 Log.d("I'm ok", "AlarmManager.onReceive ALARM_TYPE_SOUNDOFF");
 
-                if (sequenceAlarmType != ALARM_TYPE_UNKNOWN) {
-                    setAlarm(context, sequenceAlarmStartTime, sequenceAlarmType, sequenceAlarmSoundDuration, 0, ALARM_TYPE_UNKNOWN, 0);
-                    sendSms(context, ALARM_TYPE_WARNING);
+                if (sequenceAlarmType != MainActivity.ALARM_TYPE_UNKNOWN) {
+                    setAlarm(context,
+                            smsTelno, smsText,
+                            sequenceAlarmStartTime, sequenceAlarmType, sequenceAlarmSoundDuration, sequenceVibratePattern,
+                            sequenceSmsTelno, sequenceSmsText,
+                            0, MainActivity.ALARM_TYPE_UNKNOWN, 0, sequenceVibratePattern);
+                    sendSmsFromLocationUpdate(context, smsTelno, smsText, MainActivity.ALARM_TYPE_WARNING);
                 } else {
-                    sendSms(context, ALARM_TYPE_ALARM);
+                    sendSmsFromLocationUpdate(context, sequenceSmsTelno, sequenceSmsText, MainActivity.ALARM_TYPE_ALARM);
                 }
 
                 isStartActivity = false;
@@ -135,20 +125,28 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
             intentMainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             context.startActivity(intentMainActivity);
         }
-
     }
 
-    public void setAlarm(Context context, long startTime, int alarmType, long alarmSoundDuration,
-                         long sequenceAlarmStartTime, int sequenceAlarmType, long sequenceAlarmSoundDuration) {
+    public void setAlarm(Context context,
+                         String smsTelno, String smsText,
+                         long startTime, int alarmType, long alarmSoundDuration, String alarmVibratePattern,
+                         String sequenceSmsTelno, String sequenceSmsText,
+                         long sequenceAlarmStartTime, int sequenceAlarmType, long sequenceAlarmSoundDuration, String sequenceVibratePattern) {
         Log.d("I'm ok", "AlarmManager.SetAlarm (" + Integer.toString(alarmType) + ")");
 
         Intent intent = new Intent(context, AlarmManagerBroadcastReceiver.class);
 
-        intent.putExtra(ALARM_TYPE, alarmType);
-        intent.putExtra(ALARM_SOUND_DURATION, alarmSoundDuration);
-        intent.putExtra(SEQUENCE_ALARM_START_TIME, sequenceAlarmStartTime);
-        intent.putExtra(SEQUENCE_ALARM_TYPE, sequenceAlarmType);
-        intent.putExtra(SEQUENCE_ALARM_SOUND_DURATION, sequenceAlarmSoundDuration);
+        intent.putExtra(MainActivity.QUALIFIER_ALARM_TYPE, alarmType);
+        intent.putExtra(MainActivity.QUALIFIER_ALARM_SOUND_DURATION, alarmSoundDuration);
+        intent.putExtra(MainActivity.QUALIFIER_ALARM_VIBRATE_PATTERN, alarmVibratePattern);
+        intent.putExtra(MainActivity.QUALIFIER_SEQUENCE_ALARM_START_TIME, sequenceAlarmStartTime);
+        intent.putExtra(MainActivity.QUALIFIER_SEQUENCE_ALARM_TYPE, sequenceAlarmType);
+        intent.putExtra(MainActivity.QUALIFIER_SEQUENCE_ALARM_SOUND_DURATION, sequenceAlarmSoundDuration);
+        intent.putExtra(MainActivity.QUALIFIER_SEQUENCE_VIBRATE_PATTERN, sequenceVibratePattern);
+        intent.putExtra(MainActivity.QUALIFIER_ALARM_SMS_TELNO, smsTelno);
+        intent.putExtra(MainActivity.QUALIFIER_ALARM_SMS_TEXT, smsText);
+        intent.putExtra(MainActivity.QUALIFIER_SEQUENCE_SMS_TELNO, sequenceSmsTelno);
+        intent.putExtra(MainActivity.QUALIFIER_SEQUENCE_SMS_TEXT, sequenceSmsText);
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -166,40 +164,69 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
         alarmManager.cancel(sender);
     }
 
-    public void sendSms(Context context, int alarmType) {
-        Log.d("I'm ok", "AlarmManager.sendSms");
+    public void sendSmsFromLocationUpdate(Context context, final String smsTelno, final String smsText, final int alarmType) {
+        Log.d("I'm ok", "AlarmManager.sendSmsFromLocationUpdate");
 
         //get Location from Location Service
-        LocationManager locationManager = (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+
+        LocationListener locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                String locationText = "http://maps.google.com/maps?q="
+                        + Double.toString(location.getLatitude()) + ","
+                        + Double.toString(location.getLongitude());
+                sendSms(smsTelno, smsText, locationText, alarmType);
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+                if (status == LocationProvider.OUT_OF_SERVICE) {
+                    String locationText = "unknown location";
+                    sendSms(smsTelno, smsText, locationText, alarmType);
+                }
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+                 String locationText = "unknown location";
+                 sendSms(smsTelno, smsText, locationText, alarmType);
+            }
+        };
+
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
         String bestProvider = locationManager.getBestProvider(criteria, true);
-        Location location = locationManager.getLastKnownLocation(bestProvider);
-
-        String smsText = "Alarm! Location: "
-                + "https://maps.google.com/maps?s="
-                + Double.toString(location.getLatitude()) + ","
-                + Double.toString(location.getLongitude());
-
-        SmsManager sms = SmsManager.getDefault();
-        sms.sendTextMessage("01603147344", null, smsText, null, null);
-    }
-
-    public boolean getIsReceiverRunning() {
-        return m_isReceiverRunning;
-    }
-
-    public int getAlarmType() {
-        return m_alarmType;
+        locationManager.requestSingleUpdate(bestProvider, locationListener, null);
     }
 
     public void writePref(Context context, int alarmType, long nextAlarmTime) {
         Log.d("I'm ok", "AlarmManager.writePref (" + Integer.toString(alarmType) + "/" + Long.toString((nextAlarmTime - System.currentTimeMillis()) / 1000) + ")");
 
-        SharedPreferences.Editor editor = context.getSharedPreferences(AlarmManagerBroadcastReceiver.SHARED_PREF_NAME, Context.MODE_PRIVATE).edit();
-        editor.putString(SHARED_PREF_ALARM_TYPE,Integer.toString(alarmType));
-        editor.putString(SHARED_PREF_NEXT_ALARM,Long.toString(nextAlarmTime));
+        SharedPreferences.Editor editor = context.getSharedPreferences(MainActivity.SHARED_PREF_NAME, Context.MODE_PRIVATE).edit();
+        editor.putString(MainActivity.SHARED_PREF_ALARM_TYPE,Integer.toString(alarmType));
+        editor.putString(MainActivity.SHARED_PREF_NEXT_ALARM,Long.toString(nextAlarmTime));
         editor.commit();
     }
 
+    private void sendSms(String smsTelno, String smsText, String locationText, int alarmType) {
+        Log.d("I'm ok", "AlarmManager.sendSmsFromLocationUpdate");
+
+        Date currentDateTime = new Date();
+        currentDateTime.setTime(System.currentTimeMillis());
+
+        SimpleDateFormat ft = new SimpleDateFormat("dd.MM.yy HH:mm");
+        smsText = smsText
+                + ft.format(currentDateTime) + " "
+                + locationText;
+
+        Log.i("I'm ok", smsText);
+        SmsManager sms = SmsManager.getDefault();
+        sms.sendTextMessage(smsTelno, null, smsText, null, null);
+    }
 }
