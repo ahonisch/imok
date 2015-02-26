@@ -10,6 +10,48 @@
 
     <string name="action_settings">Settings</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="setting_sms_telno">SMS To:</string>
+
+    <string name="lbl_warning">1st Alarm</string>
+    <string name="lbl_warning_delay">Start Alarm after:</string>
+    <string name="lbl_warning_duration">Duration:</string>
+    <string name="lbl_warning_sms_telno">SMS to:</string>
+    <string name="txt_warning_sms_telno">+491603147344</string>
+    <string name="lbl_warning_sms_text">SMS Text:</string>
+    <string name="txt_warning_sms_text">I\'m ok - Warning</string>
+
+    <string name="lbl_alarm">2nd Alarm</string>
+    <string name="lbl_alarm_delay">Start Alarm after:</string>
+    <string name="lbl_alarm_duration">Duration:</string>
+    <string name="lbl_alarm_sms_telno">SMS to:</string>
+    <string name="txt_alarm_sms_telno">+491603147344</string>
+    <string name="lbl_alarm_sms_text">SMS Text:</string>
+    <string name="txt_alarm_sms_text">I\'m ok - Warning</string>
+
+    <string name="lbl_manually">Manually</string>
+    <string name="lbl_manually_sms_telno">SMS to:</string>
+    <string name="txt_manually_sms_telno">+491603147344</string>
+    <string name="lbl_manually_sms_text">SMS Text:</string>
+    <string name="txt_manually_sms_text">I\'m ok - Warning</string>
+
+    <string name="unit_minute">min</string>
+    <string name="unit_second">sec</string>
+
+
+    <string-array name="select_alarm_delay" >
+        <item>1 min</item>
+        <item>5 min</item>
+        <item>10 min</item>
+        <item>15 min</item>
+        <item>30 min</item>
+        <item>60 min</item>
+        <item>120 min</item>
+    </string-array>
+
+    <string-array name="select_alarm_duration" >
+        <item>30 sec</item>
+        <item>60 sec</item>
+        <item>120 sec</item>
+        <item>300 sec</item>
+    </string-array>
 
 </resources>

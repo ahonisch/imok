@@ -227,6 +227,6 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 
         Log.i("I'm ok", smsText);
         SmsManager sms = SmsManager.getDefault();
-        sms.sendTextMessage(smsTelno, null, smsText, null, null);
+        //sms.sendTextMessage(smsTelno, null, smsText, null, null);
     }
 }

@@ -28,19 +28,19 @@ public class MainActivity extends ActionBarActivity {
     final public static String SHARED_PREF_ALARM_TYPE = "info.honisch.imok.prefs.ALARM_TYPE";
 
     final public static String SHARED_PREF_WARNING_DELAY = "info.honisch.imok.prefs.warningDelay";
-    final public static String SHARED_PREF_WARNING_SOUND_DURATION = "info.honisch.imok.prefs.warningSoundDuration";
+    final public static String SHARED_PREF_WARNING_DURATION = "info.honisch.imok.prefs.warningSoundDuration";
     final public static String SHARED_PREF_WARNING_SMS_TEXT = "info.honisch.imok.prefs.warningSmsText";
     final public static String SHARED_PREF_WARNING_SMS_TELNO = "info.honisch.imok.prefs.n";
     final public static String SHARED_PREF_WARNING_VIBRATE_PATTERN = "info.honisch.imok.prefs.warningVibratePattern";
 
     final public static String SHARED_PREF_ALARM_DELAY = "info.honisch.imok.prefs.alarmDelay";
-    final public static String SHARED_PREF_ALARM_SOUND_DURATION = "info.honisch.imok.prefs.QUALIFIER_ALARM_SOUND_DURATION";
-    final public static String SHARED_PREF_SMS_TEXT_ALARM = "info.honisch.imok.prefs.alarmSmsText";
-    final public static String SHARED_PREF_SMS_ALARM_TELNO = "info.honisch.imok.prefs.alarmSmsTelno";
-    final public static String SHARED_PREF_VIBRATE_PATTERN_ALARM = "info.honisch.imok.prefs.alarmVibratePattern";
+    final public static String SHARED_PREF_ALARM_DURATION = "info.honisch.imok.prefs.QUALIFIER_ALARM_SOUND_DURATION";
+    final public static String SHARED_PREF_ALARM_SMS_TEXT = "info.honisch.imok.prefs.alarmSmsText";
+    final public static String SHARED_PREF_ALARM_SMS_TELNO = "info.honisch.imok.prefs.alarmSmsTelno";
+    final public static String SHARED_PREF_ALARM_VIBRATE_PATTERN = "info.honisch.imok.prefs.alarmVibratePattern";
 
-    final public static String SHARED_PREF_SMS_TEXT_MANUALLY = "info.honisch.imok.prefs.manuallySmsText";
-    final public static String SHARED_PREF_SMS_MANUALLY_TELNO = "info.honisch.imok.prefs.manuallySmsTelno";
+    final public static String SHARED_PREF_MANUALLY_SMS_TEXT = "info.honisch.imok.prefs.manuallySmsText";
+    final public static String SHARED_PREF_MANUALLY_SMS_TELNO = "info.honisch.imok.prefs.manuallySmsTelno";
 
     final public static String SHARED_PREF_EMERGENCY_TELNO = "info.honisch.imok.prefs.emergencyTelno";
 
@@ -94,14 +94,14 @@ public class MainActivity extends ActionBarActivity {
     private AlarmManagerBroadcastReceiver m_Alarm;
 
     // Warning
-    long warningDelay = 1 * 60 * 1000; // 1 min to waiting
+    long warningDelay = 30 * 60 * 1000; // 1 min to waiting
     long warningSoundDuration = WARNING_SOUND_DURATION;
     String warningSmsText = "I'm ok - Warning! ";
     String warningSmsTelno= "";
     String warningVibratePattern = WARNING_VIBRATE_PATTERN;
 
     // Alarm
-    long alarmDelay = 1 * 60 * 1000; // 1 min to alarm
+    long alarmDelay = 10 * 60 * 1000; // 1 min to alarm
     long alarmSoundDuration = 30 * 1000; // 30 sec
     String alarmSmsText = "I'm not ok - Alarm! ";
     String alarmSmsTelno = "";
@@ -119,7 +119,7 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.i("I'm ok", "onCreate");
+        Log.d("I'm ok", "onCreate");
 
         setContentView(R.layout.layout_reset);
 
@@ -204,7 +204,7 @@ public class MainActivity extends ActionBarActivity {
 
     // *** private methods ***
     private void initActivity() {
-        Log.i("I'm ok", "initActivity");
+        Log.d("I'm ok", "initActivity");
 
         m_Alarm = new AlarmManagerBroadcastReceiver();
 
@@ -230,13 +230,13 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void initActivityFromPref() {
-        Log.i("I'm ok", "initActivityFromPref");
+        Log.d("I'm ok", "initActivityFromPref");
 
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREF_NAME, MODE_PRIVATE);
         String prefAlarmType = sharedPreferences.getString(SHARED_PREF_ALARM_TYPE, null);
         String prefNextAlarm = sharedPreferences.getString(SHARED_PREF_NEXT_ALARM, null);
 
-        Log.i("I'm ok", "initActivityFromPref (" + prefAlarmType + "/" + Long.toString((Long.valueOf(prefNextAlarm) - System.currentTimeMillis()) / 1000) + ")");
+        Log.d("I'm ok", "initActivityFromPref (" + prefAlarmType + "/" + Long.toString((Long.valueOf(prefNextAlarm) - System.currentTimeMillis()) / 1000) + ")");
 
         int alarmType = Integer.valueOf(prefAlarmType);
         m_nextAlarm = Long.valueOf(prefNextAlarm);
@@ -246,26 +246,26 @@ public class MainActivity extends ActionBarActivity {
                 if (m_nextAlarm < System.currentTimeMillis()) setAlarm();
 
                 m_Status = STATUS_IMOK;
-                Log.i("I'm ok", "STATUS_IMOK");
+                Log.d("I'm ok", "STATUS_IMOK");
                 break;
             case ALARM_TYPE_ALARM:
                 if (m_nextAlarm < System.currentTimeMillis()) {
                     m_Status = STATUS_IMOK;
-                    Log.i("I'm ok", "STATUS_IMOK");
+                    Log.d("I'm ok", "STATUS_IMOK");
                     setAlarm();
                 }
                 else {
                     m_Status = STATUS_WARNING;
-                    Log.i("I'm ok", "STATUS_WARNING");
+                    Log.d("I'm ok", "STATUS_WARNING");
                 }
                 break;
             case ALARM_TYPE_UNKNOWN:
                 m_Status = STATUS_ALARM;
-                Log.i("I'm ok", "STATUS_ALARM");
+                Log.d("I'm ok", "STATUS_ALARM");
                 break;
             case ALARM_TYPE_SLEEPING:
                 m_Status = STATUS_SLEEPING;
-                Log.i("I'm ok", "STATUS_SLEEPING");
+                Log.d("I'm ok", "STATUS_SLEEPING");
                 break;
         }
     }
@@ -276,26 +276,26 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void createSharedPref() {
-        Log.d("I'm ok", "createSharedPref");
+        Log.i("I'm ok", "createSharedPref");
 
         SharedPreferences.Editor editor = getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE).edit();
         editor.putString(SHARED_PREF_ALARM_TYPE, String.valueOf(ALARM_TYPE_UNKNOWN));
         editor.putString(SHARED_PREF_NEXT_ALARM, String.valueOf(System.currentTimeMillis() - 1));
 
         editor.putString(SHARED_PREF_WARNING_DELAY, String.valueOf(warningDelay));
-        editor.putString(SHARED_PREF_WARNING_SOUND_DURATION, String.valueOf(warningSoundDuration));
+        editor.putString(SHARED_PREF_WARNING_DURATION, String.valueOf(warningSoundDuration));
         editor.putString(SHARED_PREF_WARNING_SMS_TEXT, warningSmsText);
         editor.putString(SHARED_PREF_WARNING_SMS_TELNO, warningSmsTelno);
         editor.putString(SHARED_PREF_WARNING_VIBRATE_PATTERN, warningVibratePattern);
 
         editor.putString(SHARED_PREF_ALARM_DELAY, String.valueOf(alarmDelay));
-        editor.putString(SHARED_PREF_ALARM_SOUND_DURATION, QUALIFIER_ALARM_SOUND_DURATION);
-        editor.putString(SHARED_PREF_SMS_TEXT_ALARM, alarmSmsText);
-        editor.putString(SHARED_PREF_SMS_ALARM_TELNO, alarmSmsTelno);
-        editor.putString(SHARED_PREF_VIBRATE_PATTERN_ALARM, alarmVibratePattern);
+        editor.putString(SHARED_PREF_ALARM_DURATION, String.valueOf(alarmSoundDuration));
+        editor.putString(SHARED_PREF_ALARM_SMS_TEXT, alarmSmsText);
+        editor.putString(SHARED_PREF_ALARM_SMS_TELNO, alarmSmsTelno);
+        editor.putString(SHARED_PREF_ALARM_VIBRATE_PATTERN, alarmVibratePattern);
 
-        editor.putString(SHARED_PREF_SMS_TEXT_MANUALLY, manuallySmsText);
-        editor.putString(SHARED_PREF_SMS_MANUALLY_TELNO, manuallySmsTelno);
+        editor.putString(SHARED_PREF_MANUALLY_SMS_TEXT, manuallySmsText);
+        editor.putString(SHARED_PREF_MANUALLY_SMS_TELNO, manuallySmsTelno);
 
         editor.putString(SHARED_PREF_EMERGENCY_TELNO, emergencyTelno);
         editor.commit();
