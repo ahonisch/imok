@@ -48,7 +48,8 @@
                 android:id="@+id/spinner_warning_delay"
                 android:layout_column="2"
                 android:spinnerMode="dropdown"
-                android:layout_gravity="center_vertical" />
+                android:layout_gravity="center_vertical"
+                android:focusable="true" />
         </TableRow>
 
         <TableRow
@@ -71,7 +72,8 @@
                 android:id="@+id/spinner_warning_duration"
                 android:layout_column="2"
                 android:spinnerMode="dropdown"
-                android:layout_gravity="center_vertical" />
+                android:layout_gravity="center_vertical"
+                android:focusable="true" />
         </TableRow>
 
         <TableRow
@@ -94,7 +96,10 @@
                 android:id="@+id/txt_warning_sms_telno"
                 android:text="@string/txt_warning_sms_telno"
                 android:layout_column="2"
-                android:selectAllOnFocus="true" />
+                android:selectAllOnFocus="false"
+                android:imeOptions="actionNext"
+                android:inputType="phone"
+                android:focusable="true" />
         </TableRow>
 
         <TableRow
@@ -117,7 +122,11 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/txt_warning_sms_text"
                 android:layout_column="2"
-                android:text="@string/txt_warning_sms_text" />
+                android:text="@string/txt_warning_sms_text"
+                android:selectAllOnFocus="false"
+                android:imeOptions="actionNext"
+                android:inputType="textEmailSubject"
+                android:focusable="true" />
         </TableRow>
 
         <TableRow
@@ -153,7 +162,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/spinner_alarm_delay"
                 android:layout_column="2"
-                android:spinnerMode="dropdown" />
+                android:spinnerMode="dropdown"
+                android:focusable="true" />
         </TableRow>
 
         <TableRow
@@ -175,7 +185,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/spinner_alarm_duration"
                 android:layout_column="2"
-                android:spinnerMode="dropdown" />
+                android:spinnerMode="dropdown"
+                android:focusable="true" />
         </TableRow>
 
         <TableRow
@@ -198,7 +209,10 @@
                 android:id="@+id/txt_alarm_sms_telno"
                 android:text="@string/txt_alarm_sms_telno"
                 android:layout_column="2"
-                android:selectAllOnFocus="true" />
+                android:selectAllOnFocus="false"
+                android:imeOptions="actionNext"
+                android:inputType="phone"
+                android:focusable="true" />
         </TableRow>
 
         <TableRow
@@ -220,7 +234,11 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/txt_alarm_sms_text"
                 android:layout_column="2"
-                android:text="@string/txt_alarm_sms_text" />
+                android:text="@string/txt_alarm_sms_text"
+                android:selectAllOnFocus="false"
+                android:imeOptions="actionNext"
+                android:inputType="textEmailSubject"
+                android:focusable="true" />
         </TableRow>
 
         <TableRow
@@ -257,7 +275,10 @@
                 android:id="@+id/txt_manually_sms_telno"
                 android:text="@string/txt_manually_sms_telno"
                 android:layout_column="2"
-                android:selectAllOnFocus="true" />
+                android:selectAllOnFocus="false"
+                android:imeOptions="actionNext"
+                android:inputType="phone"
+                android:focusable="true" />
         </TableRow>
 
         <TableRow
@@ -279,7 +300,11 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/txt_manually_sms_text"
                 android:layout_column="2"
-                android:text="@string/txt_manually_sms_text" />
+                android:text="@string/txt_manually_sms_text"
+                android:selectAllOnFocus="false"
+                android:imeOptions="actionNext"
+                android:inputType="textEmailSubject"
+                android:focusable="true" />
         </TableRow>
 
     </TableLayout>

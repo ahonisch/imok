@@ -226,20 +226,7 @@ public class MainActivity extends ActionBarActivity {
 
         initActivityFromPref();
 
-        updateGui();
-    }
-
-    private void initActivityFromPref() {
-        Log.d("I'm ok", "initActivityFromPref");
-
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREF_NAME, MODE_PRIVATE);
-        String prefAlarmType = sharedPreferences.getString(SHARED_PREF_ALARM_TYPE, null);
-        String prefNextAlarm = sharedPreferences.getString(SHARED_PREF_NEXT_ALARM, null);
-
-        Log.d("I'm ok", "initActivityFromPref (" + prefAlarmType + "/" + Long.toString((Long.valueOf(prefNextAlarm) - System.currentTimeMillis()) / 1000) + ")");
-
-        int alarmType = Integer.valueOf(prefAlarmType);
-        m_nextAlarm = Long.valueOf(prefNextAlarm);
+        int alarmType = Integer.valueOf(sharedPreferences.getString(SHARED_PREF_ALARM_TYPE, null));
 
         switch (alarmType) {
             case ALARM_TYPE_WARNING:
@@ -268,6 +255,38 @@ public class MainActivity extends ActionBarActivity {
                 Log.d("I'm ok", "STATUS_SLEEPING");
                 break;
         }
+
+        updateGui();
+    }
+
+    private void initActivityFromPref() {
+        Log.d("I'm ok", "initActivityFromPref");
+
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREF_NAME, MODE_PRIVATE);
+        String prefAlarmType = sharedPreferences.getString(SHARED_PREF_ALARM_TYPE, null);
+        String prefNextAlarm = sharedPreferences.getString(SHARED_PREF_NEXT_ALARM, null);
+
+        warningDelay = Long.valueOf(sharedPreferences.getString(SHARED_PREF_WARNING_DELAY, null));
+        warningSoundDuration = Long.valueOf(sharedPreferences.getString(SHARED_PREF_WARNING_DURATION, null));
+        warningSmsTelno = sharedPreferences.getString(SHARED_PREF_WARNING_SMS_TELNO, null);
+        warningSmsText = sharedPreferences.getString(SHARED_PREF_WARNING_SMS_TEXT, null);
+        warningVibratePattern = sharedPreferences.getString(SHARED_PREF_WARNING_VIBRATE_PATTERN, null);
+
+        alarmDelay = Long.valueOf(sharedPreferences.getString(SHARED_PREF_ALARM_DELAY, null));
+        alarmSoundDuration = Long.valueOf(sharedPreferences.getString(SHARED_PREF_ALARM_DURATION, null));
+        alarmSmsTelno = sharedPreferences.getString(SHARED_PREF_ALARM_SMS_TELNO, null);
+        alarmSmsText = sharedPreferences.getString(SHARED_PREF_ALARM_SMS_TEXT, null);
+        alarmVibratePattern = sharedPreferences.getString(SHARED_PREF_ALARM_VIBRATE_PATTERN, null);
+
+        manuallySmsText = sharedPreferences.getString(SHARED_PREF_MANUALLY_SMS_TEXT, null);
+        manuallySmsTelno = sharedPreferences.getString(SHARED_PREF_MANUALLY_SMS_TELNO, null);
+
+        emergencyTelno = sharedPreferences.getString(SHARED_PREF_EMERGENCY_TELNO, null);
+
+        Log.d("I'm ok", "initActivityFromPref (" + prefAlarmType + "/" + Long.toString((Long.valueOf(prefNextAlarm) - System.currentTimeMillis()) / 1000) + ")");
+
+        m_nextAlarm = Long.valueOf(prefNextAlarm);
+
     }
 
     private void openSettings() {
@@ -344,7 +363,6 @@ public class MainActivity extends ActionBarActivity {
         m_Status = STATUS_IMOK;
 
         stopCounter();
-
         startCounter();
 
         updateGui();
@@ -417,21 +435,18 @@ public class MainActivity extends ActionBarActivity {
     private void setAlarm() {
         Log.d("I'm ok", "setAlarm");
 
+        initActivityFromPref();
+
         Context context = this.getApplicationContext();
 
-        long timeToWarning = warningDelay;
-        long timeToAlarm = alarmDelay;
-        long alarmSoundDuration = warningSoundDuration;
-        long sequenceAlarmSoundDuration = this.alarmSoundDuration;
-
-        m_nextAlarm = System.currentTimeMillis() + timeToWarning;
-        long sequenceAlarmStartTime = System.currentTimeMillis() + timeToWarning + timeToAlarm;
+        m_nextAlarm = System.currentTimeMillis() + warningDelay;
+        long sequenceAlarmStartTime = System.currentTimeMillis() + warningDelay + alarmDelay;
 
         m_Alarm.setAlarm(context,
                 warningSmsTelno, warningSmsText,
-                m_nextAlarm, ALARM_TYPE_WARNING, alarmSoundDuration, warningVibratePattern,
+                m_nextAlarm, ALARM_TYPE_WARNING, warningSoundDuration, warningVibratePattern,
                 alarmSmsTelno, alarmSmsText,
-                sequenceAlarmStartTime, ALARM_TYPE_ALARM, sequenceAlarmSoundDuration, alarmVibratePattern);
+                sequenceAlarmStartTime, ALARM_TYPE_ALARM, alarmSoundDuration, alarmVibratePattern);
         m_Alarm.writePref(context, ALARM_TYPE_WARNING, m_nextAlarm);
 
     }

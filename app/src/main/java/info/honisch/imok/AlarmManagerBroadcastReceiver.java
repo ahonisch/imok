@@ -11,8 +11,10 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.net.MailTo;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.provider.ContactsContract;
 import android.telephony.SmsManager;
 import android.util.Log;
 
@@ -225,8 +227,8 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
                 + ft.format(currentDateTime) + " "
                 + locationText;
 
-        Log.i("I'm ok", smsText);
+        Log.i("I'm ok", smsTelno + ":" + smsText);
         SmsManager sms = SmsManager.getDefault();
-        //sms.sendTextMessage(smsTelno, null, smsText, null, null);
+        sms.sendTextMessage(smsTelno, null, smsText, null, null);
     }
 }
