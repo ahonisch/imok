@@ -47,20 +47,20 @@ public class Settings extends ActionBarActivity {
         spinnerAlarmDuration.setAdapter(adapterAlarmDuration);
         spinnerAlarmDuration.setOnItemSelectedListener(new SpinnerSelectedListener());
 
-        EditText txtWarningSmsTo = (EditText) findViewById(R.id.txt_warning_sms_telno);
-        txtWarningSmsTo.setOnEditorActionListener(new EditTextActionListener());
+        EditText txtWarningSmsTelNo = (EditText) findViewById(R.id.txt_warning_sms_telno);
+        txtWarningSmsTelNo.setOnEditorActionListener(new EditTextActionListener());
 
         EditText txtWarningSmsText = (EditText) findViewById(R.id.txt_warning_sms_text);
         txtWarningSmsText.setOnEditorActionListener(new EditTextActionListener());
 
-        EditText txtAlarmSmsTo = (EditText) findViewById(R.id.txt_alarm_sms_telno);
-        txtAlarmSmsTo.setOnEditorActionListener(new EditTextActionListener());
+        EditText txtAlarmSmsTelno = (EditText) findViewById(R.id.txt_alarm_sms_telno);
+        txtAlarmSmsTelno.setOnEditorActionListener(new EditTextActionListener());
 
         EditText txtAlarmSmsText = (EditText) findViewById(R.id.txt_alarm_sms_text);
         txtAlarmSmsText.setOnEditorActionListener(new EditTextActionListener());
 
-        EditText txtManuallySmsTo = (EditText) findViewById(R.id.txt_manually_sms_telno);
-        txtManuallySmsTo.setOnEditorActionListener(new EditTextActionListener());
+        EditText txtManuallySmsTelno = (EditText) findViewById(R.id.txt_manually_sms_telno);
+        txtManuallySmsTelno.setOnEditorActionListener(new EditTextActionListener());
 
         EditText txtManuallySmsText = (EditText) findViewById(R.id.txt_manually_sms_text);
         txtManuallySmsText.setOnEditorActionListener(new EditTextActionListener());

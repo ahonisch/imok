@@ -26,7 +26,7 @@ public class EditTextActionListener implements TextView.OnEditorActionListener {
                     writePref(v.getContext(), MainActivity.SHARED_PREF_ALARM_SMS_TELNO, v.getText().toString());
                     break;
                 case R.id.txt_alarm_sms_text:
-                    writePref(v.getContext(), MainActivity.SHARED_PREF_ALARM_SMS_TELNO, v.getText().toString());
+                    writePref(v.getContext(), MainActivity.SHARED_PREF_ALARM_SMS_TEXT, v.getText().toString());
                     break;
                 case R.id.txt_manually_sms_telno:
                     writePref(v.getContext(), MainActivity.SHARED_PREF_MANUALLY_SMS_TELNO, v.getText().toString());
