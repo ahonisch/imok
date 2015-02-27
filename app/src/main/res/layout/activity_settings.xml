@@ -307,6 +307,32 @@
                 android:focusable="true" />
         </TableRow>
 
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:paddingBottom="@dimen/settings_row_edit_bottom_margin">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/lbl_emergency_telno"
+                android:id="@+id/lbl_emergency_telno"
+                android:layout_column="0"
+                android:singleLine="true" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/txt_emergency_telno"
+                android:text="@string/txt_emergency_telno"
+                android:layout_column="2"
+                android:selectAllOnFocus="false"
+                android:imeOptions="actionNext"
+                android:inputType="phone"
+                android:focusable="true" />
+        </TableRow>
+
     </TableLayout>
 
 </ScrollView>

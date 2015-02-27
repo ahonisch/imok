@@ -33,6 +33,9 @@
     <string name="lbl_manually_sms_text">SMS Text:</string>
     <string name="txt_manually_sms_text">I\'m ok - Manually</string>
 
+    <string name="lbl_emergency_telno">Emergency:</string>
+    <string name="txt_emergency_telno"></string>
+
     <string name="unit_minute">min</string>
     <string name="unit_second">sec</string>
 

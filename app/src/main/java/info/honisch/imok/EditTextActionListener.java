@@ -13,33 +13,29 @@ import android.widget.TextView;
 public class EditTextActionListener implements TextView.OnEditorActionListener {
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        boolean isHandled = false;
 
         if(actionId == EditorInfo.IME_ACTION_NEXT) {
             switch (v.getId()) {
                 case R.id.txt_warning_sms_telno:
                     writePref(v.getContext(), MainActivity.SHARED_PREF_WARNING_SMS_TELNO, v.getText().toString());
-                    isHandled = true;
                     break;
                 case R.id.txt_warning_sms_text:
                     writePref(v.getContext(), MainActivity.SHARED_PREF_WARNING_SMS_TEXT, v.getText().toString());
-                    isHandled = true;
                     break;
                 case R.id.txt_alarm_sms_telno:
                     writePref(v.getContext(), MainActivity.SHARED_PREF_ALARM_SMS_TELNO, v.getText().toString());
-                    isHandled = true;
                     break;
                 case R.id.txt_alarm_sms_text:
                     writePref(v.getContext(), MainActivity.SHARED_PREF_ALARM_SMS_TELNO, v.getText().toString());
-                    isHandled = true;
                     break;
                 case R.id.txt_manually_sms_telno:
                     writePref(v.getContext(), MainActivity.SHARED_PREF_MANUALLY_SMS_TELNO, v.getText().toString());
-                    isHandled = true;
                     break;
                 case R.id.txt_manually_sms_text:
                     writePref(v.getContext(), MainActivity.SHARED_PREF_MANUALLY_SMS_TEXT, v.getText().toString());
-                    isHandled = true;
+                    break;
+                case R.id.txt_emergency_telno:
+                    writePref(v.getContext(), MainActivity.SHARED_PREF_EMERGENCY_TELNO, v.getText().toString());
                     break;
             }
         }

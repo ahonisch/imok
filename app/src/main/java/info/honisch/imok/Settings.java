@@ -65,6 +65,9 @@ public class Settings extends ActionBarActivity {
         EditText txtManuallySmsText = (EditText) findViewById(R.id.txt_manually_sms_text);
         txtManuallySmsText.setOnEditorActionListener(new EditTextActionListener());
 
+        EditText txtEmergencyTelNo = (EditText) findViewById(R.id.txt_emergency_telno);
+        txtEmergencyTelNo.setOnEditorActionListener(new EditTextActionListener());
+
         initFromPrefs();
 }
 
@@ -108,6 +111,8 @@ public class Settings extends ActionBarActivity {
         initEditTextFromPref(MainActivity.SHARED_PREF_ALARM_SMS_TEXT, R.id.txt_alarm_sms_text);
         initEditTextFromPref(MainActivity.SHARED_PREF_MANUALLY_SMS_TELNO, R.id.txt_manually_sms_telno);
         initEditTextFromPref(MainActivity.SHARED_PREF_MANUALLY_SMS_TEXT, R.id.txt_manually_sms_text);
+
+        initEditTextFromPref(MainActivity.SHARED_PREF_EMERGENCY_TELNO, R.id.txt_emergency_telno);
     }
 
     private void initEditTextFromPref(String prefName, int viewId) {

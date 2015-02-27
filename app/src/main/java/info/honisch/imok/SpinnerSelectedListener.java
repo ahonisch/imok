@@ -6,9 +6,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 
-/**
- * Created by Andi on 26.02.2015.
- */
 public class SpinnerSelectedListener implements AdapterView.OnItemSelectedListener {
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -41,8 +38,8 @@ public class SpinnerSelectedListener implements AdapterView.OnItemSelectedListen
     }
 
     private long extractIntFromSpinnerSelection(Context context, String selection, int unitId){
-        Log.i("I'm ok", "extractIntFromSpinnerSelection: " + selection + "=" + context.getString(unitId));
-        Log.i("I'm ok", "extractIntFromSpinnerSelection: " + selection.substring(0, 2) + "/" + selection.length() + "/" + context.getString(unitId).length());
+        Log.d("I'm ok", "extractIntFromSpinnerSelection: " + selection + "=" + context.getString(unitId));
+        Log.d("I'm ok", "extractIntFromSpinnerSelection: " + selection.substring(0, 2) + "/" + selection.length() + "/" + context.getString(unitId).length());
         return Long.valueOf(selection.substring(0, selection.length() - (context.getString(unitId).length()+1)));
     }
 
