@@ -13,7 +13,9 @@
 
     <string name="lbl_warning">1st Alarm</string>
     <string name="lbl_warning_delay">Intervall:</string>
+    <string name="prompt_Spinner_warning_delay">1st Alarm - Intervall:</string>
     <string name="lbl_warning_duration">Duration:</string>
+    <string name="prompt_Spinner_warning_duration">1st Alarm - Duration:</string>
     <string name="lbl_warning_sms_telno">SMS to:</string>
     <string name="txt_warning_sms_telno"></string>
     <string name="lbl_warning_sms_text">SMS Text:</string>
@@ -21,7 +23,9 @@
 
     <string name="lbl_alarm">2nd Alarm</string>
     <string name="lbl_alarm_delay">Intervall:</string>
+    <string name="prompt_Spinner_alarm_delay">2nd Alarm - Intervall:</string>
     <string name="lbl_alarm_duration">Duration:</string>
+    <string name="prompt_Spinner_alarm_duration">2nd Alarm - Duration:</string>
     <string name="lbl_alarm_sms_telno">SMS to:</string>
     <string name="txt_alarm_sms_telno"></string>
     <string name="lbl_alarm_sms_text">SMS Text:</string>
@@ -40,14 +44,20 @@
     <string name="unit_second">sec</string>
 
 
-    <string-array name="select_alarm_delay" >
-        <item>1 min</item>
-        <item>5 min</item>
+    <string-array name="select_warning_delay" >
         <item>10 min</item>
         <item>15 min</item>
         <item>30 min</item>
         <item>60 min</item>
         <item>120 min</item>
+        <item>180 min</item>
+    </string-array>
+
+    <string-array name="select_alarm_delay" >
+        <item>5 min</item>
+        <item>10 min</item>
+        <item>15 min</item>
+        <item>30 min</item>
     </string-array>
 
     <string-array name="select_alarm_duration" >

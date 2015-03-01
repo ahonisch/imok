@@ -4,6 +4,6 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="settings_row_headline_bottom_margin">30dp</dimen>
-    <dimen name="settings_row_spinner_bottom_margin">20dp</dimen>
+    <dimen name="settings_row_spinner_bottom_margin">30dp</dimen>
     <dimen name="settings_row_edit_bottom_margin">16dp</dimen>
 </resources>

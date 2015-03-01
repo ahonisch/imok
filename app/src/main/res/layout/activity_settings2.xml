@@ -40,7 +40,6 @@
                 android:text="@string/lbl_warning_delay"
                 android:id="@+id/lbl_warning_delay"
                 android:layout_column="0"
-                android:labelFor="@id/spinner_warning_delay"
                 android:layout_gravity="center_vertical" />
 
             <Spinner
@@ -49,7 +48,8 @@
                 android:id="@+id/spinner_warning_delay"
                 android:layout_column="2"
                 android:spinnerMode="dropdown"
-                android:layout_gravity="center_vertical" />
+                android:layout_gravity="center_vertical"
+                android:focusable="true" />
         </TableRow>
 
         <TableRow
@@ -64,8 +64,7 @@
                 android:text="@string/lbl_warning_duration"
                 android:id="@+id/lbl_warning_duration"
                 android:layout_column="0"
-                android:layout_gravity="center_vertical"
-                android:labelFor="@id/spinner_warning_duration" />
+                android:layout_gravity="center_vertical" />
 
             <Spinner
                 android:layout_width="wrap_content"
@@ -73,7 +72,8 @@
                 android:id="@+id/spinner_warning_duration"
                 android:layout_column="2"
                 android:spinnerMode="dropdown"
-                android:layout_gravity="center_vertical" />
+                android:layout_gravity="center_vertical"
+                android:focusable="true" />
         </TableRow>
 
         <TableRow
@@ -88,8 +88,7 @@
                 android:text="@string/lbl_warning_sms_telno"
                 android:id="@+id/lbl_warning_sms_telno"
                 android:layout_column="0"
-                android:singleLine="true"
-                android:labelFor="@string/txt_warning_sms_telno" />
+                android:singleLine="true" />
 
             <EditText
                 android:layout_width="wrap_content"
@@ -97,7 +96,10 @@
                 android:id="@+id/txt_warning_sms_telno"
                 android:text="@string/txt_warning_sms_telno"
                 android:layout_column="2"
-                android:selectAllOnFocus="true" />
+                android:selectAllOnFocus="false"
+                android:imeOptions="actionNext"
+                android:inputType="phone"
+                android:focusable="true" />
         </TableRow>
 
         <TableRow
@@ -113,16 +115,18 @@
                 android:id="@+id/lbl_warning_sms_text"
                 android:layout_column="0"
                 android:singleLine="true"
-                android:linksClickable="false"
-                android:labelFor="@id/txt_warning_sms_text"
-                android:longClickable="true" />
+                android:linksClickable="false" />
 
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/txt_warning_sms_text"
                 android:layout_column="2"
-                android:text="@string/txt_warning_sms_text" />
+                android:text="@string/txt_warning_sms_text"
+                android:selectAllOnFocus="false"
+                android:imeOptions="actionNext"
+                android:inputType="textEmailSubject"
+                android:focusable="true" />
         </TableRow>
 
         <TableRow
@@ -151,15 +155,15 @@
                 android:text="@string/lbl_alarm_delay"
                 android:id="@+id/lbl_alarm_delay"
                 android:layout_column="0"
-                android:layout_gravity="center_vertical"
-                android:labelFor="@id/spinner_alarm_delay" />
+                android:layout_gravity="center_vertical" />
 
             <Spinner
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/spinner_alarm_delay"
                 android:layout_column="2"
-                android:spinnerMode="dropdown" />
+                android:spinnerMode="dropdown"
+                android:focusable="true" />
         </TableRow>
 
         <TableRow
@@ -174,15 +178,15 @@
                 android:text="@string/lbl_alarm_duration"
                 android:id="@+id/lbl_alarm_duration"
                 android:layout_column="0"
-                android:layout_gravity="center_vertical"
-                android:labelFor="@id/spinner_alarm_duration" />
+                android:layout_gravity="center_vertical" />
 
             <Spinner
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/spinner_alarm_duration"
                 android:layout_column="2"
-                android:spinnerMode="dropdown" />
+                android:spinnerMode="dropdown"
+                android:focusable="true" />
         </TableRow>
 
         <TableRow
@@ -197,8 +201,7 @@
                 android:text="@string/lbl_alarm_sms_telno"
                 android:id="@+id/lbl_alarm_sms_telno"
                 android:layout_column="0"
-                android:singleLine="true"
-                android:labelFor="@id/txt_alarm_sms_telno" />
+                android:singleLine="true" />
 
             <EditText
                 android:layout_width="wrap_content"
@@ -206,7 +209,10 @@
                 android:id="@+id/txt_alarm_sms_telno"
                 android:text="@string/txt_alarm_sms_telno"
                 android:layout_column="2"
-                android:selectAllOnFocus="true" />
+                android:selectAllOnFocus="false"
+                android:imeOptions="actionNext"
+                android:inputType="phone"
+                android:focusable="true" />
         </TableRow>
 
         <TableRow
@@ -221,15 +227,18 @@
                 android:text="@string/lbl_alarm_sms_text"
                 android:id="@+id/lbl_alarm_sms_text"
                 android:layout_column="0"
-                android:singleLine="true"
-                android:labelFor="@id/txt_alarm_sms_text" />
+                android:singleLine="true" />
 
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/txt_alarm_sms_text"
                 android:layout_column="2"
-                android:text="@string/txt_alarm_sms_text" />
+                android:text="@string/txt_alarm_sms_text"
+                android:selectAllOnFocus="false"
+                android:imeOptions="actionNext"
+                android:inputType="textEmailSubject"
+                android:focusable="true" />
         </TableRow>
 
         <TableRow
@@ -258,8 +267,7 @@
                 android:text="@string/lbl_manually_sms_telno"
                 android:id="@+id/lbl_manually_sms_telno"
                 android:layout_column="0"
-                android:singleLine="true"
-                android:labelFor="@id/txt_manually_sms_telno" />
+                android:singleLine="true" />
 
             <EditText
                 android:layout_width="wrap_content"
@@ -267,7 +275,10 @@
                 android:id="@+id/txt_manually_sms_telno"
                 android:text="@string/txt_manually_sms_telno"
                 android:layout_column="2"
-                android:selectAllOnFocus="true" />
+                android:selectAllOnFocus="false"
+                android:imeOptions="actionNext"
+                android:inputType="phone"
+                android:focusable="true" />
         </TableRow>
 
         <TableRow
@@ -282,15 +293,44 @@
                 android:text="@string/lbl_manually_sms_text"
                 android:id="@+id/lbl_manually_sms_text"
                 android:layout_column="0"
-                android:singleLine="true"
-                android:labelFor="@id/txt_manually_sms_text" />
+                android:singleLine="true" />
 
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/txt_manually_sms_text"
                 android:layout_column="2"
-                android:text="@string/txt_manually_sms_text" />
+                android:text="@string/txt_manually_sms_text"
+                android:selectAllOnFocus="false"
+                android:imeOptions="actionNext"
+                android:inputType="textEmailSubject"
+                android:focusable="true" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:paddingBottom="@dimen/settings_row_edit_bottom_margin">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/lbl_emergency_telno"
+                android:id="@+id/lbl_emergency_telno"
+                android:layout_column="0"
+                android:singleLine="true" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/txt_emergency_telno"
+                android:text="@string/txt_emergency_telno"
+                android:layout_column="2"
+                android:selectAllOnFocus="false"
+                android:imeOptions="actionNext"
+                android:inputType="phone"
+                android:focusable="true" />
         </TableRow>
 
     </TableLayout>

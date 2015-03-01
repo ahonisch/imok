@@ -24,7 +24,7 @@ public class Settings extends ActionBarActivity {
         setContentView(R.layout.activity_settings);
 
         Spinner spinnerWarningDelay = (Spinner) findViewById(R.id.spinner_warning_delay);
-        ArrayAdapter<CharSequence> adapterWarningDelay = ArrayAdapter.createFromResource(this, R.array.select_alarm_delay, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> adapterWarningDelay = ArrayAdapter.createFromResource(this, R.array.select_warning_delay, android.R.layout.simple_spinner_item);
         adapterWarningDelay.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerWarningDelay.setAdapter(adapterWarningDelay);
         spinnerWarningDelay.setOnItemSelectedListener(new SpinnerSelectedListener());

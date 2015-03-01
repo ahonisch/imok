@@ -186,7 +186,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
         };
 
         Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
         String bestProvider = locationManager.getBestProvider(criteria, true);
         locationManager.requestSingleUpdate(bestProvider, locationListener, null);
     }
